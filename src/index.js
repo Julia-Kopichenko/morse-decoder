@@ -38,28 +38,31 @@ const MORSE_TABLE = {
 };
 function decode(expr) {
     let result = '';
-    let symbol2Morse = '';
-    function val2key(val,obj) {
-        for (let key in obj) {
-          if (obj[key] === val) {
-            return key;
-          }
-        }
-        return false;
-    };
 
-    for (let i = 0; i < expr.length; i++) {
-      if (expr[i] === ' ') {
-        result += '**********';
-        continue;
-      }
-
-      symbol2Morse = val2key(expr[i], MORSE_TABLE);
-
-      result += symbol2Morse.replace(/\-/g, '11').replace(/\./g, '10').padStart(10, '0');
+    for (let i = 0; i < expr.length; i = i + 10) {
+      result += decodingSymbol(expr.slice(i, i + 10), MORSE_TABLE);
     }
+
+    function decodingSymbol(cipher, table) {
+      let morseCode = [];
+      for (let i = cipher.length - 2; i >= 0; i = i - 2) {
+        if (cipher[i] + cipher[i + 1] === '**') {
+          return ' ';
+        } else if (cipher[i] + cipher[i + 1] === '10') {
+          morseCode.unshift('.');
+        } else if (cipher[i] + cipher[i + 1] === '11') {
+          morseCode.unshift('-');
+        } else {
+          break;
+        }
+      }
+      morseCode = morseCode.join('');
+
+      return Object.entries(table).find((element) => element[0] === morseCode)[1];
+    }
+
     return result;
-}
+  }
 
 
 module.exports = {
